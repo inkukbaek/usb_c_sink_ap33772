@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="https://inkukbaek.github.io/mcp2221a_web/favicon.ico" type="image/x-icon">
+        <title>USB-C PD SINK - AP33772 with MCP2221A</title>
+        <link rel="stylesheet" type="text/css" href="styles.css" >
+    </head>
+
+    <body>
+        <div class="main-container">
+            <div class="header">
+                <h1>USB-C PD SINK - AP33772 with MCP2221A</h1>
+                <button id="connect">Connect</button>
+                <button id="reset">Reset</button>
+                <div id="status"></div>
+            </div>
+
+            <div class="section">
+                <h2>USB-C PD SINK</h2>
+                <!-- Get PDO -->
+                <div class="usb-c-pd-sink-container">
+                    <div class="pd-sink-controls">
+                        <button id="get-pdo">GET PDOs</button>
+                        <input type="text" id="pdo_list" placeholder="PDO ITEMS" >
+                    </div>
+                </div>
+                <!-- Set PDO -->
+                <div class="usb-c-pd-sink-container">
+                    <div class="pd-sink-controls">
+                        <div class="pd-sink-items">
+                            <button id="set-pdo">SET PDO</button>
+                            <div class="input-group">
+                                <label> PDO_ID </label>
+                                <select id="pdo-combobox" name="pdos">
+                                    <option value="na">N/A</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label> VOLTAGE [mV] </label>
+                                <select id="voltage-combobox" name="voltage">
+                                    <option value="na">N/A</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label> CURRENT [mA] </label>
+                                <select id="current-combobox" name="current">
+                                    <option value="na">N/A</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label> APDO Update </label>
+                                <input type="checkbox" id="apdo-update-checkbox" >
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>I2C Control</h2>
+            </div>
+            <div class="section">
+                <div class="i2c-container">
+                    <div class="i2c-controls">
+                        <div class="input-group">
+                            <label for="i2c-slave-address">I2C Slave Address</label>
+                            <input type="text" id="i2c-slave-address" placeholder="Slave Address (hex)" value="0xf0">
+                        </div>
+                        <div class="input-group">
+                            <label for="i2c-register-address">Register Address</label>
+                            <input type="text" id="i2c-register-address" placeholder="Register Address (hex)" value="0x40">
+                        </div>
+                        <div class="input-group">
+                            <label for="i2c-data">Data</label>
+                            <input type="text" id="i2c-data" placeholder="Data (hex)" value="0x00">
+                        </div>
+                        <div class="input-group">
+                            <label for="i2c-length">I2C Read Length</label>
+                            <input type="number" id="i2c-length" placeholder="Length" value="1">
+                        </div>
+                        <div class="button-group">
+                            <button id="i2c-write">Write</button>
+                            <button id="i2c-read">Read</button>
+                            <button id="i2c-find-addr">Find Address</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="i2c-container">
+                    <div class="i2c-controls">
+                        <input type="file" id="fileInput" accept=".txt" style="display: none;">
+                        <div class="input-group">
+                            <label for="i2c-slave-address-script">I2C Slave Address for Script</label>
+                            <input type="text" id="i2c-slave-address-script" placeholder="Slave Address (hex)" value="0xf0">
+                        </div>
+                        <div class="button-group">
+                            <button id="i2c-load-script">Load Script</button>
+                        </div>
+                        <div class="button-group">
+                            <button id="i2c-run-script">Run Script</button>
+                        </div>
+                        <div class="input-group">
+                            <label for="i2c-script-format"> Script Format = '(Reg Addr(Hex), Data(Hex))'</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="i2c-container">
+                    <div class="i2c-controls">
+                        <div class="input-group">
+                            <label for="i2c-register-address-first">Dump Reg Address First</label>
+                            <input type="text" id="i2c-register-address-first" placeholder="First Register Address (hex)" value="0x00">
+                        </div>
+                        <div class="input-group">
+                            <label for="i2c-register-address-last">Dump Reg Address Last</label>
+                            <input type="text" id="i2c-register-address-last" placeholder="Last Register Address (hex)" value="0x0F">
+                        </div>
+                        <div class="button-group">
+                            <button id="i2c-dump">Dump</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="i2c-container">
+                    <div class="i2c-controls">
+                        <div class="input-group-short">
+                            <label for="bit7">bit 7</label>
+                            <input type="text" id="bit7" placeholder="Bit7" value="X">
+                        </div>
+                        <div class="input-group-short">
+                            <label for="bit6">bit 6</label>
+                            <input type="text" id="bit6" placeholder="Bit6" value="X">
+                        </div>
+                        <div class="input-group-short">
+                            <label for="bit5">bit 5</label>
+                            <input type="text" id="bit5" placeholder="Bit5" value="X">
+                        </div>
+                        <div class="input-group-short">
+                            <label for="bit4">bit 4</label>
+                            <input type="text" id="bit4" placeholder="Bit4" value="X">
+                        </div>
+                        <div class="input-group-short">
+                            <label for="bit3">bit 3</label>
+                            <input type="text" id="bit3" placeholder="Bit3" value="X">
+                        </div>
+                        <div class="input-group-short">
+                            <label for="bit2">bit 2</label>
+                            <input type="text" id="bit2" placeholder="Bit2" value="X">
+                        </div>
+                        <div class="input-group-short">
+                            <label for="bit1">bit 1</label>
+                            <input type="text" id="bit1" placeholder="Bit1" value="X">
+                        </div>
+                        <div class="input-group-short">
+                            <label for="bit0">bit 0</label>
+                            <input type="text" id="bit0" placeholder="Bit0" value="X">
+                        </div>
+                        <div class="button-group-short">
+                            <button id="i2c-bit-update">Bit update</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="'tab-container">
+                <div class="tab-buttons">
+                    <!-- <button class="tab-button active" onclick="openTab(event, 'logTab')">Log</button>
+                    <button class="tab-button" onclick="openTab(event, 'etc1Tab')">ETC1</button>
+                    <button class="tab-button" onclick="openTab(event, 'etc2Tab')">ETC2</button> -->
+                    <button id="tab-button-log" data-tab="logTab" class="tab-button active">Log</button>
+                    <!-- <button id="tab-button-etc1" data-tab="etc1Tab" class="tab-button">ETC1</button>
+                    <button id="tab-button-etc2" data-tab="etc2Tab" class="tab-button">ETC2</button> -->
+                </div>
+                <div id="logTab" class="tab-content active">
+                    <!-- <h2>Logs</h2> -->
+                    <div class="button-group">
+                        <button id="clear-log">Clear</button>
+                        <button id="extract-log">Extract</button>
+                    </div>
+                    <div class="log-container">
+                        <pre id="log"></pre>
+                    </div>
+                </div>
+                <div id="etc1Tab" class="tab-content">
+                    <div class="script-container">
+                        <h2>Scripts</h2>
+                        <textarea id="script"></textarea>
+                        <button id="script-run">Run</button>
+                    </div>
+                    <div class="script-container">
+                        <textarea id="console"></textarea>
+                    </div>
+
+                </div>
+                <div id="etc2Tab" class="tab-content">
+
+                </div>
+            </div>
+
+        </div>
+
+        <script type="module", src="main.js"></script>
+    </body>
+</html>
