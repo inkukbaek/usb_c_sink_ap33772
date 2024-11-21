@@ -12,9 +12,16 @@
         <div class="main-container">
             <div class="header">
                 <h1>USB-C PD SINK - AP33772 with MCP2221A</h1>
-                <button id="connect">Connect</button>
-                <button id="reset">Reset</button>
-                <div id="status"></div>
+                <button id="connect-mcp2221a">Connect<br>MCP2221A</button>
+                <button id="reset-mcp2221a">Reset<br>MCP2221A</button>
+                <button id="connect-aardvark">Connect<br>AARDVARK</button>
+                <button id="reset-aardvark">Reset<br>AARDVARK</button>
+                <!-- <button id="connect">Connect</button>
+                <button id="reset">Reset</button> -->
+                <div class="input-group-connect">
+                    <input type="text" id="connected-adapter" placeholder="Not Connected" readonly margin-top="10px">
+                </div>
+
             </div>
 
             <div class="section">

@@ -45,6 +45,19 @@ body {
     /* margin: 10px 0;
     width: 100%; */
   }
+  .input-group-connect {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin-top: 10px;
+  }
+  .input-group-connect input {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin-top: 10px;
+    width: 44%;
+  }
 
   .section h2 {
     text-align: left;

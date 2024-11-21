@@ -1,6 +1,8 @@
 import {MCP2221} from './mcp2221a_web.js'
+import {AARDVARK} from './aardvark_web.js'
 import {USB_PD_Sink_AP33772} from './ap33772_web.js'
-let mcp;
+let i2c_host_adapter;
+let i2c_host_adapter_name;
 let usb_pd_sink;
 let gp_status;
 
@@ -8,25 +10,51 @@ let gp_status;
 // ****************************************
 // I2C Event Listener
 // ****************************************
-document.getElementById('connect').addEventListener('click', async () => {
-    mcp = new MCP2221();
-    const init_response = await mcp.init();
-    logMessage(init_response.message)
-    await mcp.init_state();
-    usb_pd_sink = new USB_PD_Sink_AP33772(mcp)
-    logMessage('USB_PD_SINK - connected');
+// document.getElementById('connect').addEventListener('click', async () => {
+//     mcp = new MCP2221();
+//     const init_response = await mcp.init();
+//     logMessage(init_response.message)
+//     await mcp.init_state();
+//     usb_pd_sink = new USB_PD_Sink_AP33772(mcp)
+//     logMessage('USB_PD_SINK - connected');
 
+// });
+
+document.getElementById('connect-aardvark').addEventListener('click', async () => {
+    // const result = await navigator.usb.getDevices()
+    // console.log(result)
+    i2c_host_adapter = new AARDVARK();
+    const init_response = await i2c_host_adapter.init();
+    i2c_host_adapter_name = i2c_host_adapter.device.productName;
+    document.getElementById("connected-adapter").value = `${i2c_host_adapter_name} is connected`
+    logMessage(init_response.message)
+    usb_pd_sink = new USB_PD_Sink_AP33772(i2c_host_adapter)
+    logMessage('USB_PD_SINK - Ready, Connect USB-PD Source');
 });
 
-document.getElementById('reset').addEventListener('click', async () => {
+document.getElementById('connect-mcp2221a').addEventListener('click', async () => {
+    i2c_host_adapter = new MCP2221();
+    const init_response = await i2c_host_adapter.init();
+    console.log(i2c_host_adapter.device)
+    i2c_host_adapter_name = i2c_host_adapter.device.productName
+    document.getElementById("connected-adapter").value = `${i2c_host_adapter_name} is connected`
+    logMessage(init_response.message)
+    await i2c_host_adapter.init_state();
+    // gp_status = await i2c_host_adapter.gpioGetPins();
+    // updateGPIOStates(gp_status);
+    usb_pd_sink = new USB_PD_Sink_AP33772(i2c_host_adapter)
+    logMessage('USB_PD_SINK - Ready, Connect USB-PD Source');
+});
+
+document.getElementById('reset-mcp2221a').addEventListener('click', async () => {
     try {
-        await mcp.reset()
-        mcp = new MCP2221();
-        const init_response = await mcp.init();
+        await i2c_host_adapter.reset()
+        i2c_host_adapter = new MCP2221();
+        const init_response = await i2c_host_adapter.init();
         logMessage(init_response.message)
-        await mcp.init_state();
-        // gp_status = await mcp.gpioGetPins();
-        usb_pd_sink = new USB_PD_Sink_AP33772(mcp)
+        await i2c_host_adapter.init_state();
+        // gp_status = await i2c_host_adapter.gpioGetPins();
+        usb_pd_sink = new USB_PD_Sink_AP33772(i2c_host_adapter)
     } catch (error) {
         document.getElementById('status').innerText = `Error: ${error.message}`;
     }
@@ -211,7 +239,7 @@ document.getElementById('i2c-write').addEventListener('click', async () => {
     // Implement I2C write using WebHID API
     console.log(data);
     logMessage( 'i2c-write', hexString(slaveAddress), hexString(registerAddress), Array.from(data).map(x => hexString(x)).join(', ') )
-    const i2cWriteData = await mcp.i2cWrite(slaveAddress, registerAddress, data);
+    const i2cWriteData = await i2c_host_adapter.i2cWrite(slaveAddress, registerAddress, data);
     console.log(i2cWriteData);
     const writeLog = Array.from(i2cWriteData.data).map(x => hexString(x)).join(', ');
     logMessage( 'MCP2221A - WRITE:', hexString(slaveAddress), hexString(registerAddress), `[${writeLog}]`);
@@ -224,7 +252,7 @@ document.getElementById('i2c-read').addEventListener('click', async () => {
     const length = parseInt(document.getElementById('i2c-length').value);
     // Implement I2C read using WebHID API
     // logMessage( 'i2c-read', hexString(slaveAddress), hexString(registerAddress), hexString(length) );
-    const i2cReadData = await mcp.i2cRead(slaveAddress, registerAddress, length);
+    const i2cReadData = await i2c_host_adapter.i2cRead(slaveAddress, registerAddress, length);
     if (i2cReadData.success){
         console.log('i2cReadData', i2cReadData.data);
         const readLog = Array.from(i2cReadData.data).map(x => hexString(x)).join(', ');
@@ -294,7 +322,7 @@ document.getElementById('i2c-run-script').addEventListener('click', async () => 
         const registerAddress = parseInt(pair.hex1, 16);
         // const data = parseInt(pair.hex2);
         const data = pair.hex2.split(',').map(value => parseInt(value, 16));
-        const i2cWriteData = await mcp.i2cWrite(slaveAddress, registerAddress, data);
+        const i2cWriteData = await i2c_host_adapter.i2cWrite(slaveAddress, registerAddress, data);
         const writeLog = Array.from(i2cWriteData.data).map(x => hexString(x)).join(', ');
         logMessage( 'MCP2221A - WRITE:', hexString(slaveAddress), hexString(registerAddress), `[${writeLog}]`);
     }
@@ -310,7 +338,7 @@ document.getElementById('i2c-dump').addEventListener('click', async () => {
     // Implement I2C read using WebHID API
     for(let regAddr = firstRegisterAddress; regAddr <= lastRegisterAddress; regAddr++) {
         // logMessage( 'i2c-read', hexString(slaveAddress), hexString(regAddr), hexString(length) );
-        const i2cReadData = await mcp.i2cRead(slaveAddress, regAddr, length);
+        const i2cReadData = await i2c_host_adapter.i2cRead(slaveAddress, regAddr, length);
         if (i2cReadData.success){
             console.log('i2cReadData', i2cReadData.data);
             const readLog = Array.from(i2cReadData.data).map(x => hexString(x)).join(', ');
@@ -340,12 +368,12 @@ document.getElementById('i2c-bit-update').addEventListener('click', async () => 
         }
     }
     logMessage('bitPositions', bitPositions, 'bitValues', bitValues);
-    mcp.i2cUpdateByte(slaveAddress, registerAddress, bitPositions, bitValues)
+    i2c_host_adapter.i2cUpdateByte(slaveAddress, registerAddress, bitPositions, bitValues)
 });
 
 document.getElementById('i2c-find-addr').addEventListener('click', async () => {
     const candidates = [];
-    const i2c_addr_found = await mcp.i2cSearchSlaveAddress(candidates);
+    const i2c_addr_found = await i2c_host_adapter.i2cSearchSlaveAddress(candidates);
     // logMessage(i2c_addr_found);
     document.getElementById('i2c-slave-address').value = hexString(i2c_addr_found[0])
 
@@ -457,9 +485,9 @@ function updateGPIOState(pin, gpioState) {
 
 async function setGPIO(pin, state) {
     // Implement GPIO set using WebHID API
-    if (mcp.device.opened) {
+    if (i2c_host_adapter.device.opened) {
         logMessage(`setGPIO pin ${pin}, ${state}`)
-        const gpioState = await mcp.gpioSetPin(pin, state)
+        const gpioState = await i2c_host_adapter.gpioSetPin(pin, state)
         updateGPIOState(pin, gpioState)
     } else {
         logMessage('not connected')
@@ -468,8 +496,8 @@ async function setGPIO(pin, state) {
 
 async function toggleGPIO(pin) {
 
-    if (mcp.device.opened) {
-        const gpioState = await mcp.toggleGpioPin(pin)
+    if (i2c_host_adapter.device.opened) {
+        const gpioState = await i2c_host_adapter.toggleGpioPin(pin)
         console.log('gpioState',gpioState)
         logMessage(`toggleGPIO pin ${pin} to ${gpioState}`)
         updateGPIOState(pin, gpioState)
